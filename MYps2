@@ -6,12 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
-#include <errno.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <limits.h>
 #include <stdbool.h>
 
@@ -59,33 +57,33 @@ struct opts parseArgs(int argc, char *argv[]){
     MYstruct.sysTime = false;
     MYstruct.virtMem = false;
     MYstruct.cmdLine = true;
-    while((optNum = getopt(argc, argv, ":-p:-s-U-S-V-C")) != -1){
+    while((optNum = getopt(argc, argv, ":-p:-s-U-S-v-C")) != -1){
         //switch case for all of the options. Then store these options in a struct to be used later in
         //the program
         //print statements are used to make sure the arguments are saved
         switch(optNum) {
             case 'p':
-                printf("you have chose p\n");
+                //printf("you have chose p\n");
                 MYstruct.pid = optarg;
                 break;
             case 's':
-                printf("you have chose s\n");
+                //printf("you have chose s\n");
                 MYstruct.state = true;
                 break;
             case 'U':
-                printf("you have chose U\n");
+                //printf("you have chose U\n");
                 MYstruct.time = false;
                 break;
             case 'S':
-                printf("you have chose S\n");
+                //printf("you have chose S\n");
                 MYstruct.sysTime = true;
                 break;
-            case 'V':
-                printf("you have chose V\n");
+            case 'v':
+                //printf("you have chose V\n");
                 MYstruct.virtMem = true;
                 break;
             case 'C':
-                printf("you have chose C\n");
+                //printf("you have chose C\n");
                 MYstruct.cmdLine = false;
                 break;
             case '?':
@@ -102,8 +100,6 @@ void printPs(char *pid, struct opts procArgs){
     char cmdLinePath[PATH_MAX];
 
     FILE *fp;
-
-    char buf[MAX_BUFF];
 
     char state[MAX_BUFF];
     char userTime[MAX_BUFF];
@@ -125,14 +121,20 @@ void printPs(char *pid, struct opts procArgs){
         printf("Could not open file: /proc/%s/stat\n", pid);
         exit(1);
     }
-    /*
-    while(fgets(buf, sizeof(buf), fp) != NULL){
-
-    }*/
-    fscanf(fp, )
-
-
+    //Super lengthy way of reading this file
+//                                  state                                     utime  stime
+    fscanf(fp, "%*s %*s %s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %s %s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s", state, userTime, sysTime);
     fclose(fp);
+
+    if(procArgs.state){
+        printf("State: %s\n", state);
+    }
+    if(procArgs.time){
+        printf("User time consumed: %s\n", userTime);
+    }
+    if(procArgs.sysTime){
+        printf("System time consumed: %s\n", sysTime);
+    }
 
     //statm
     if(procArgs.virtMem){
@@ -141,7 +143,8 @@ void printPs(char *pid, struct opts procArgs){
             printf("Could not open file: /proc/%s/statm\n", pid);
             exit(1);
         }
-
+        fscanf(fp, "%s %*s %*s %*s %*s %*s %*s", virtMem);
+        printf("Virtual memory currently used: %s\n", virtMem);
         fclose(fp);
     }
 
@@ -152,6 +155,7 @@ void printPs(char *pid, struct opts procArgs){
             printf("Could not open file: /proc/%s/cmdline\n", pid);
             exit(1);
         }
+        printf("Command Line: ");
         char c;
         c = fgetc(fp);//fgetc gets the next character in the file
         while(c != EOF){//This will run until EOF is empty
