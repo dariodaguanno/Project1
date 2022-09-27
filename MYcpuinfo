@@ -1,0 +1,28 @@
+//
+// Created by Dario Daguanno on 9/8/2022.
+//
+//This program is part of the warmup which will use proc to display the number of processors
+//and the amount of cache in each CPU
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(){
+    char c;
+    FILE *fp;
+    //fopen will open the file cpuinfo that is a part of proc
+    fp = fopen("/proc/cpuinfo", "rb");
+
+    if(fp == NULL){
+        printf("MYcpuinfo could not open\n");
+        exit(1);
+    }
+
+    c = fgetc(fp);//fgetc gets the next character in the file
+    while(c != EOF){//This will run until EOF is empty
+        printf("%c", c);
+        c = fgetc(fp);
+    }
+    fclose(fp);
+    return 0;
+}
